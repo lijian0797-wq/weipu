@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>专属客服按钮 · 二期调整原型</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f2f3f5;
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── 顶部标注 ── */
+    .demo-bar {
+      width: 100%;
+      max-width: 390px;
+      background: #1a1a2e;
+      border-radius: 12px 12px 0 0;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .demo-bar span {
+      font-size: 12px;
+      color: #aaa;
+    }
+    .demo-bar strong {
+      font-size: 12px;
+      color: #7c9fff;
+    }
+
+    /* ── 场景切换 ── */
+    .scene-switcher {
+      width: 100%;
+      max-width: 390px;
+      background: #fff;
+      padding: 14px 16px;
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .scene-btn {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 12px;
+      color: #555;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .scene-btn.active {
+      border-color: #1677ff;
+      background: #e8f0ff;
+      color: #1677ff;
+      font-weight: 600;
+    }
+
+    /* ── 手机壳 ── */
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      background: #fff;
+      min-height: 560px;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+    }
+
+    /* ── 小程序导航栏 ── */
+    .nav-bar {
+      background: #fff;
+      padding: 12px 16px 10px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-back {
+      font-size: 18px;
+      color: #333;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .nav-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    /* ── 订单卡片 ── */
+    .page-content { padding: 12px; }
+
+    .order-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .order-header {
+      padding: 12px 14px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .order-no {
+      font-size: 12px;
+      color: #999;
+    }
+    .order-status {
+      font-size: 12px;
+      color: #fa8c16;
+      font-weight: 500;
+    }
+    .car-info {
+      padding: 12px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .car-img {
+      width: 72px;
+      height: 54px;
+      background: linear-gradient(135deg, #e8edf5 0%, #d0daea 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .car-detail { flex: 1; }
+    .car-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    .car-sub {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 6px;
+    }
+    .car-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #e53935;
+    }
+
+    /* ── 操作按钮区 ── */
+    .action-bar {
+      padding: 10px 14px 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #f5f5f5;
+    }
+    .btn {
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      font-weight: 500;
+    }
+    .btn-ghost {
+      background: #fff;
+      border: 1.5px solid #d9d9d9;
+      color: #555;
+    }
+    .btn-ghost:hover { border-color: #1677ff; color: #1677ff; }
+
+    /* 核心：动态客服按钮 */
+    .btn-kefu {
+      background: #1677ff;
+      color: #fff;
+    }
+    .btn-kefu:hover { background: #0958d9; }
+    .btn-kefu.is-online {
+      background: #fff;
+      border: 1.5px solid #1677ff;
+      color: #1677ff;
+    }
+    .btn-kefu.is-online:hover { background: #e8f0ff; }
+
+    /* ── 场景说明条 ── */
+    .scene-tip {
+      margin: 0 12px 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .scene-tip.tip-blue {
+      background: #e8f4ff;
+      color: #1677ff;
+      border-left: 3px solid #1677ff;
+    }
+    .scene-tip.tip-gray {
+      background: #f5f5f5;
+      color: #888;
+      border-left: 3px solid #bbb;
+    }
+
+    /* ── 弹窗遮罩 ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.show { display: flex; }
+
+    /* ── 二维码弹窗 ── */
+    .qr-modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 280px;
+      overflow: hidden;
+      animation: popUp .22s ease;
+    }
+    @keyframes popUp {
+      from { transform: scale(.88); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    .qr-modal-header {
+      padding: 16px 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .qr-modal-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .qr-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+    }
+    .qr-close:hover { background: #eee; }
+    .qr-body {
+      padding: 20px 24px 16px;
+      text-align: center;
+    }
+    .qr-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e8e8e8;
+      border-top-color: #1677ff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .qr-img-wrap {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 12px;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+    }
+    .qr-img-wrap.loaded { display: block; }
+
+    /* 用 canvas 生成一个示意二维码 */
+    canvas.qr-canvas { width: 160px; height: 160px; display: block; }
+
+    .qr-name {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .qr-hint {
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 16px;
+    }
+    .qr-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .btn-save {
+      flex: 1;
+      padding: 9px 0;
+      background: #1677ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-chat {
+      flex: 1;
+      padding: 9px 0;
+      background: #07c160;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* ── 在线客服跳转弹窗 ── */
+    .online-modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 280px;
+      padding: 28px 24px 20px;
+      text-align: center;
+      animation: popUp .22s ease;
+    }
+    .online-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    .online-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .online-desc {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .btn-confirm {
+      width: 100%;
+      padding: 10px 0;
+      background: #1677ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-cancel-text {
+      display: block;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #999;
+      cursor: pointer;
+    }
+
+    /* ── 底部图例 ── */
+    .legend {
+      width: 100%;
+      max-width: 390px;
+      margin-top: 16px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .legend-title {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .legend-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tag-blue { background: #1677ff; color: #fff; }
+    .tag-outline { background: #fff; border: 1.5px solid #1677ff; color: #1677ff; }
+  </style>
+</head>
+<body>
+
+<!-- 顶部说明 -->
+<div class="demo-bar">
+  <span>原型 · 二期调整</span>
+  <strong>专属客服按钮文案动态化</strong>
+</div>
+
+<!-- 场景切换 -->
+<div class="scene-switcher">
+  <button class="scene-btn active" onclick="setScene('qr')" id="btn-qr">
+    ✅ 场景 A<br>接口返回企微码
+  </button>
+  <button class="scene-btn" onclick="setScene('online')" id="btn-online">
+    🔗 场景 B<br>接口未返回二维码
+  </button>
+</div>
+
+<!-- 手机页面 -->
+<div class="phone">
+  <div class="nav-bar">
+    <span class="nav-back">‹</span>
+    <span class="nav-title">买到的车</span>
+  </div>
+
+  <div class="page-content">
+
+    <!-- 场景说明 -->
+    <div class="scene-tip tip-blue" id="tip-qr">
+      <b>场景 A</b>：接口返回了企微码图片 → 按钮显示「专属客服」
+    </div>
+    <div class="scene-tip tip-gray" id="tip-online" style="display:none">
+      <b>场景 B</b>：接口未返回二维码（历史订单工作日 / 未配置客服）→ 按钮显示「在线客服」
+    </div>
+
+    <!-- 订单卡片 -->
+    <div class="order-card">
+      <div class="order-header">
+        <span class="order-no">订单号：BMS2024031500123</span>
+        <span class="order-status">过户中</span>
+      </div>
+      <div class="car-info">
+        <div class="car-img">🚗</div>
+        <div class="car-detail">
+          <div class="car-name">2022款 宝马 3系 320Li</div>
+          <div class="car-sub">里程 3.2万公里 · 上海</div>
+          <div class="car-price">¥ 218,000</div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-ghost">查看详情</button>
+        <!-- 核心按钮，通过 JS 切换文案和样式 -->
+        <button class="btn btn-kefu" id="kefu-btn" onclick="clickKefuBtn()">
+          专属客服
+        </button>
+      </div>
+    </div>
+
+    <!-- 第二张订单（仅作页面丰富度，不含按钮） -->
+    <div class="order-card" style="opacity:.5;pointer-events:none">
+      <div class="order-header">
+        <span class="order-no">订单号：BMS2024030900087</span>
+        <span class="order-status" style="color:#52c41a">已完成</span>
+      </div>
+      <div class="car-info">
+        <div class="car-img">🚙</div>
+        <div class="car-detail">
+          <div class="car-name">2021款 奥迪 A4L 40TFSI</div>
+          <div class="car-sub">里程 5.1万公里 · 北京</div>
+          <div class="car-price">¥ 196,500</div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-ghost">查看详情</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 图例说明 -->
+<div class="legend">
+  <div class="legend-title">二期变更说明</div>
+  <div class="legend-row">
+    <span class="tag tag-blue">专属客服</span>
+    接口返回企微码图片时显示，点击弹窗展示二维码
+  </div>
+  <div class="legend-row">
+    <span class="tag tag-outline">在线客服</span>
+    接口未返回二维码时显示，点击跳转在线客服页（历史订单工作日 / 未配置客服）
+  </div>
+</div>
+
+
+<!-- ── 弹窗：二维码 ── -->
+<div class="overlay" id="overlay-qr" onclick="closeOnBg(event,'overlay-qr')">
+  <div class="qr-modal">
+    <div class="qr-modal-header">
+      <span class="qr-modal-title">专属客服</span>
+      <button class="qr-close" onclick="closeModal('overlay-qr')">✕</button>
+    </div>
+    <div class="qr-body">
+      <!-- Loading 状态 -->
+      <div class="qr-loading" id="qr-loading">
+        <div class="spinner"></div>
+        <span style="font-size:12px;color:#bbb">加载中…</span>
+      </div>
+      <!-- 二维码图 -->
+      <div class="qr-img-wrap" id="qr-img-wrap">
+        <canvas class="qr-canvas" id="qr-canvas" width="320" height="320"></canvas>
+      </div>
+      <div class="qr-name" id="qr-name" style="display:none">跟单客服：张晓梅</div>
+      <div class="qr-hint" id="qr-hint" style="display:none">长按二维码可识别 · 添加企业微信</div>
+      <div class="qr-actions" id="qr-actions" style="display:none">
+        <button class="btn-save" onclick="showToast('已保存到相册')">保存二维码</button>
+        <button class="btn-chat" onclick="showToast('打开客服插件')">联系客服</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 弹窗：在线客服跳转 ── -->
+<div class="overlay" id="overlay-online" onclick="closeOnBg(event,'overlay-online')">
+  <div class="online-modal">
+    <div class="online-icon">💬</div>
+    <div class="online-title">在线客服</div>
+    <div class="online-desc">
+      即将为您跳转至在线客服页，<br>您可以在线与客服沟通
+    </div>
+    <button class="btn-confirm" onclick="closeModal('overlay-online');showToast('已跳转至在线客服')">
+      确认跳转
+    </button>
+    <span class="btn-cancel-text" onclick="closeModal('overlay-online')">取消</span>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="
+  display:none;
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  padding:8px 20px;
+  border-radius:20px;
+  font-size:13px;
+  z-index:999;
+  white-space:nowrap;
+"></div>
+
+
+<script>
+  let currentScene = 'qr';
+
+  // ── 场景切换 ──
+  function setScene(scene) {
+    currentScene = scene;
+    const kefuBtn = document.getElementById('kefu-btn');
+    const tipQr   = document.getElementById('tip-qr');
+    const tipOnline = document.getElementById('tip-online');
+    const btnQr   = document.getElementById('btn-qr');
+    const btnOnline = document.getElementById('btn-online');
+
+    if (scene === 'qr') {
+      kefuBtn.textContent = '专属客服';
+      kefuBtn.classList.remove('is-online');
+      tipQr.style.display = '';
+      tipOnline.style.display = 'none';
+      btnQr.classList.add('active');
+      btnOnline.classList.remove('active');
+    } else {
+      kefuBtn.textContent = '在线客服';
+      kefuBtn.classList.add('is-online');
+      tipQr.style.display = 'none';
+      tipOnline.style.display = '';
+      btnQr.classList.remove('active');
+      btnOnline.classList.add('active');
+    }
+  }
+
+  // ── 点击客服按钮 ──
+  function clickKefuBtn() {
+    if (currentScene === 'qr') {
+      openQrModal();
+    } else {
+      document.getElementById('overlay-online').classList.add('show');
+    }
+  }
+
+  // ── 打开二维码弹窗（模拟 loading） ──
+  function openQrModal() {
+    document.getElementById('overlay-qr').classList.add('show');
+    // 重置状态
+    document.getElementById('qr-loading').style.display = 'flex';
+    document.getElementById('qr-img-wrap').classList.remove('loaded');
+    document.getElementById('qr-name').style.display = 'none';
+    document.getElementById('qr-hint').style.display = 'none';
+    document.getElementById('qr-actions').style.display = 'none';
+
+    // 模拟加载延迟
+    setTimeout(() => {
+      drawQR();
+      document.getElementById('qr-loading').style.display = 'none';
+      document.getElementById('qr-img-wrap').classList.add('loaded');
+      document.getElementById('qr-name').style.display = 'block';
+      document.getElementById('qr-hint').style.display = 'block';
+      document.getElementById('qr-actions').style.display = 'flex';
+    }, 900);
+  }
+
+  // ── 绘制示意二维码（canvas） ──
+  function drawQR() {
+    const canvas = document.getElementById('qr-canvas');
+    const ctx = canvas.getContext('2d');
+    const size = 320;
+    ctx.clearRect(0, 0, size, size);
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, size, size);
+
+    const cell = 10;
+    const cols = size / cell;
+    // 随机种子固定
+    const seed = 42;
+    let s = seed;
+    function rand() { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; }
+
+    ctx.fillStyle = '#222';
+    for (let r = 0; r < cols; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (rand() > 0.5) ctx.fillRect(c * cell, r * cell, cell, cell);
+      }
+    }
+    // 三个定位角
+    function corner(x, y) {
+      ctx.fillStyle = '#222';
+      ctx.fillRect(x, y, 70, 70);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(x+10, y+10, 50, 50);
+      ctx.fillStyle = '#222';
+      ctx.fillRect(x+20, y+20, 30, 30);
+    }
+    corner(0, 0); corner(250, 0); corner(0, 250);
+
+    // 品牌标 logo 区域
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(125, 125, 70, 70);
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillStyle = '#1677ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('示', 160, 160);
+  }
+
+  // ── 关闭弹窗 ──
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+  function closeOnBg(e, id) {
+    if (e.target.id === id) closeModal(id);
+  }
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 2000);
+  }
+</script>
+</body>
+</html>
